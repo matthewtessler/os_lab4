@@ -1,6 +1,5 @@
 /* Student Name: Matthew Tessler */
 import java.util.*;
-import java.io.*;
 
 public class paging {
 	public static void main(String[] args) {
@@ -22,5 +21,24 @@ public class paging {
 		System.out.println("The replacement algorithm is " + replacementAlgo + ".");
 		System.out.println("The level of debugging output is " + debugging + ".\n");
 
+		/* create a representation of a frame table --> machine size with rows length of pageSize */
+		int[] machine = new int[machineSize];
+		for (int i = 0; i < machine.length; i++) { 
+			machine[i] = -1;
+		}
+
+		printFrameTable(machine, pageSize); // testing printing 
+
+	}
+
+	/* prints the frame table which is the total size of the machine, divided into rows of frames */
+	public static void printFrameTable(int[] machine, int pageSize) {
+		for (int i = 0; i < machine.length / pageSize; i++) {
+			System.out.print("\nFrame " + i);
+			for (int j = 0; j < pageSize; j++) {
+				System.out.print(" " + machine[i*j]);
+			}
+		}
+		System.out.println();
 	}
 }
