@@ -21,24 +21,38 @@ public class paging {
 		System.out.println("The replacement algorithm is " + replacementAlgo + ".");
 		System.out.println("The level of debugging output is " + debugging + ".\n");
 
-		/* create a representation of a frame table --> machine size with rows length of pageSize */
-		int[] machine = new int[machineSize];
-		for (int i = 0; i < machine.length; i++) { 
-			machine[i] = -1;
-		}
-
-		printFrameTable(machine, pageSize); // testing printing 
-
+		FrameTable machine = new FrameTable(machineSize, pageSize);
 	}
+}
 
-	/* prints the frame table which is the total size of the machine, divided into rows of frames */
-	public static void printFrameTable(int[] machine, int pageSize) {
-		for (int i = 0; i < machine.length / pageSize; i++) {
-			System.out.print("\nFrame " + i);
-			for (int j = 0; j < pageSize; j++) {
-				System.out.print(" " + machine[i*j]);
-			}
+
+// a machine organized as a frame table divided up into frames
+class FrameTable {
+	Frame[] frames;
+
+	// instantiates an array of frame objects with length machine size divided by page size
+	public FrameTable(int machineSize, int pageSize) {
+		this.frames = new Frame[machineSize/pageSize];
+		for (int i = 0; i < frames.length; i++) {
+			this.frames[0] = new Frame(pageSize);
 		}
-		System.out.println();
+	}
+}
+
+// frame within frame table of machine
+class Frame {
+	Page onePage;
+
+	public Frame(int pageSize) {
+		this.onePage = new Page(pageSize);
+	}
+}
+
+// holds information about specific page from process
+class Page {
+	int[] references;
+
+	public Page(int pageSize) {
+		this.references = new int[pageSize]; 
 	}
 }
