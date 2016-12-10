@@ -36,40 +36,49 @@ public class paging {
 				processes[i] = new Process(processSize, pageSize, i);
 			}
 		}
+		
+		// loop through processes until all have made required number of references
+		int current = 0; 
+		int time = 0;
+		while (!allReferencesFulfilled(processes,numOfReferences)) {
+			for (int i = 0; i < 3; i++) {
+				if (processes[current].referenceCount + (3 - i) > numOfReferences) {
+					continue;
+				};
 
-		int currentProcess = 0;
-		int count = 0;
-		/* cycle through the references for all the processes */
-		for (int time = 0; time < numOfReferences * processes.length; time++) {
-			if (count == 3) {
-				if (currentProcess == processes.length - 1) {
-					currentProcess = 0;
-					count = 0;
-				}
-				else {
-					currentProcess++;
-					count = 0;
-				}
+				/* work goes here */
+
+				processes[current].referenceCount++;
+				time++;
 			}
-			System.out.println("Process Number " + currentProcess + " and time " + time);
-
-
-			/* work goes here, I think */
-
-
-			count++;
-			processes[currentProcess].referenceCount++;
+			if (current == processes.length - 1) {
+				current = 0;
+			}
+			else {
+				current++;
+			}
 		}
 
 		for (int i = 0; i < processes.length; i++) {
 			System.out.println(processes[i].referenceCount);
 		}
+		System.out.println(time);
+
 	}
 
 
 	public static void print(FrameTable machine, Process[] processes) {
 		FrameTable.print(machine.frames);
 		Process.printAllProcesses(processes);
+	}
+
+	public static boolean allReferencesFulfilled(Process[] processes, int numOfReferences) {
+		for (int i = 0; i < processes.length; i++) {
+			if (processes[i].referenceCount < numOfReferences) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
 
@@ -146,7 +155,7 @@ class Process {
 			}
 		}
 		this.initialReference = (111 * (processNum + 1) + processSize) % processSize;
-		this.referenceCount = 1;
+		this.referenceCount = 0;
 	}
 
 	public static void print(Page[] pages) {
