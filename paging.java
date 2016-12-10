@@ -23,37 +23,55 @@ public class paging {
 
 		/* stores frames that hold individual pages from different processes */
 		FrameTable machine = new FrameTable(machineSize, pageSize);
-		Process processes[];
+		Process processes[] = new Process[1];
 		
 		/* if jobMix is one there is only one process and it makes N references sequentially */
 		if (jobMix == 1) {
 			processes = new Process[1];
 			processes[0] = new Process(processSize, pageSize, 0);
 		}
-		/* if jobMix is two there are four processes -> each process makes references
-		   within itself sequentially, making three references each in a round robin style between
-		   the four processes -> the initial reference is determined by a formula dependent on the 
-		   number of that process and the size of all individual processes (processSize - S) */
-		else if (jobMix == 2) {
-
+		else if (jobMix == 2 || jobMix == 3 || jobMix == 4) {
+			processes = new Process[4];
+			for (int i = 0; i < processes.length; i++) {
+				processes[i] = new Process(processSize, pageSize, i);
+			}
 		}
-		/* if jobMix is three it is like jobMix two except references are not sequential, they are 
-		   determined by randomOS -> the initial reference is determined by same formula as jobMix two */
-		else if (jobMix == 3) {
 
-		}
-		/* if jobMix is four it is still three references per process in round robin except the number
-		   it is referencing is randomly selected */
-		else if (jobMix == 4) {
+		int currentProcess = 0;
+		int count = 0;
+		/* cycle through the references for all the processes */
+		for (int time = 0; time < numOfReferences * processes.length; time++) {
+			if (count == 3) {
+				if (currentProcess == processes.length - 1) {
+					currentProcess = 0;
+					count = 0;
+				}
+				else {
+					currentProcess++;
+					count = 0;
+				}
+			}
+			System.out.println("Process Number " + currentProcess + " and time " + time);
 
+
+			/* work goes here, I think */
+
+
+			count++;
+			processes[currentProcess].referenceCount++;
 		}
-		else {
-			System.out.println("Job mix input error.");
-			System.exit(0);
+
+		for (int i = 0; i < processes.length; i++) {
+			System.out.println(processes[i].referenceCount);
 		}
 	}
-}
 
+
+	public static void print(FrameTable machine, Process[] processes) {
+		FrameTable.print(machine.frames);
+		Process.printAllProcesses(processes);
+	}
+}
 
 // a machine organized as a frame table divided up into frames
 class FrameTable {
@@ -114,6 +132,8 @@ class Page {
 // individual processes have an array of pages dependent on processSize and pageSize
 class Process {
 	Page[] pages; // an array with size of processSize divided by pageSize
+	int initialReference;
+	int referenceCount;
 
 	// instantiates array of pages each having pageSize number of references
 	public Process(int processSize, int pageSize, int processNum) {
@@ -125,17 +145,18 @@ class Process {
 				this.pages[i].references[j] = i * (10) + j;
 			}
 		}
+		this.initialReference = (111 * (processNum + 1) + processSize) % processSize;
+		this.referenceCount = 1;
 	}
 
 	public static void print(Page[] pages) {
-		System.out.println("Process Reference Table");
-		System.out.print("+---------+");;
+		System.out.print("+---------+");
 		for (int i = 0; i < pages[0].references.length; i++) {
 			System.out.print("----+");
 		}
 		System.out.println("");
 		for (int i = 0; i < pages.length; i++) {
-			System.out.printf("|Frame %3d|",i);	
+			System.out.printf("|Page %3d|",i);	
 			for (int j = 0; j < pages[i].references.length; j++) {
 				System.out.printf("%4d|", pages[i].references[j]);
 			}
@@ -149,4 +170,15 @@ class Process {
 		}
 		System.out.println("");
 	}
+
+	public static void printAllProcesses(Process[] processes) {
+		System.out.println("+---------------------+");
+		System.out.println("All Process Tables!!!!");
+		System.out.println("+---------------------+\n");
+		for (int i = 0; i < processes.length; i++) {
+			System.out.println("Process Table " + i);
+			print(processes[i].pages);
+		}
+	}
+
 }
