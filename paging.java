@@ -73,6 +73,7 @@ public class paging {
 					processes[current].lastUsageTime[(processes[current].currentReference)/10] = time;
 				}
 				else {
+					processes[current].faults++;
 					// if there is an empty frame to put the page containing the reference
 					if (findHighestEmptyFrame(machine) != -1) {
 						// put page in highest empty frame and set load time
@@ -85,10 +86,30 @@ public class paging {
 						machine.frames[highestEmptyFrame].onePage.process = current;
 						processes[current].pageLoadTime[processes[current].currentReference/10] = time;
 					}
+					// page replacement algorithm: store eviction info, residency time, eviction count for process, load time for new page
 					else {
-						System.out.print("evicting page (not implemented yet).\n");
-						// page replacement algorithm
-							// store eviction info, residency time, eviction count for process, load time for new page
+						// evict the least recently used (lowest last used time)
+						if (replacementAlgo.equals("lru")) {
+							int leastRecentlyUsedFrame = 500;
+							// for each frame get the last usage time of the page
+							for (int k = 0; k < machine.frames.length; k++) {
+								// find the last usage time of that page for that process by integer dividing that element
+								// if the time is lower than the current time set the least recently used equal to that one
+								if (processes[machine.frames[k].onePage.process].lastUsageTime[machine.frames[k].onePage.references[2] / 10] <= leastRecentlyUsedFrame) {
+									leastRecentlyUsedFrame = k;
+								}
+							}
+							System.out.println("evicting page " + (machine.frames[leastRecentlyUsedFrame].onePage.references[3] / 10) + " of process " + 
+								machine.frames[leastRecentlyUsedFrame].onePage.process + " from frame " + leastRecentlyUsedFrame + ".\n");
+							processes[current].residency += time - processes[machine.frames[leastRecentlyUsedFrame].onePage.process].pageLoadTime[machine.frames[leastRecentlyUsedFrame].onePage.references[3] / 10];
+							processes[current].evictions++;
+							machine.frames[leastRecentlyUsedFrame].onePage.process = current;
+							// replace it by copying in the new page and setting the process value of that frame to the new process, pageLoadTime
+							for (int j = 0; j < machine.frames[leastRecentlyUsedFrame].onePage.references.length; j++) {
+								machine.frames[leastRecentlyUsedFrame].onePage.references[j] = processes[current].pages[processes[current].currentReference/10].references[j];
+							}
+							processes[current].pageLoadTime[processes[current].currentReference/10] = time;
+						}
 					}
 				}
 				// find next reference for the process dependent on jobMix
@@ -153,6 +174,33 @@ public class paging {
 				current++;
 			}
 		}
+
+		// print results
+		int totalFaults = 0;
+		int totalResidency = 0;
+		int totalEvictions = 0;
+		for (int i = 0; i < processes.length; i++) {
+			if (processes[i].evictions != 0) {
+				System.out.println("Process " + (i+1) + " had " + processes[i].faults + " faults and " + ((double)processes[i].residency / (double)processes[i].evictions) + " average residency.");
+				totalFaults += processes[i].faults;
+				totalResidency += processes[i].residency;
+				totalEvictions += processes[i].evictions;
+			}
+			else {
+				System.out.println("Process " + (i+1) + " had " + processes[i].faults + " faults.");
+				System.out.println("	With no evictions, the overall average residency is undefined.");
+				totalFaults += processes[i].faults;
+			}
+			
+		}
+		if (totalEvictions != 0) {
+			System.out.println("\nThe total number of faults is " + totalFaults + " and the overall average residency is " + (double)totalResidency/(double)totalEvictions + ".");
+		}
+		else {
+			System.out.println("\nThe total number of faults is " + totalFaults + " faults.");
+			System.out.println("	With no evictions, the overall average residency is undefined.");
+		}
+		
 	}
 
 	// prints the frame table and all process tables
@@ -218,7 +266,7 @@ class FrameTable {
 		System.out.println("Frame Table");
 		System.out.print("+---------+----------+");;
 		for (int i = 0; i < frames[0].onePage.references.length; i++) {
-			System.out.print("---+");
+			System.out.print("----+");
 		}
 		System.out.println("");
 		for (int i = 0; i < frames.length; i++) {
@@ -229,7 +277,7 @@ class FrameTable {
 			}
 			System.out.print("\n+---------+----------+");
 			for (int k = 0; k < frames[0].onePage.references.length; k++) {
-				System.out.print("---+");
+				System.out.print("----+");
 				if (k == frames[0].onePage.references.length - 1) {
 					System.out.println("");
 				}
@@ -269,6 +317,9 @@ class Process {
 	int initialReference;
 	int referenceCount;
 	int currentReference;
+	int faults;
+	int residency;
+	int evictions;
 
 	// instantiates array of pages each having pageSize number of references
 	public Process(int processSize, int pageSize, int processNum) {
@@ -291,6 +342,9 @@ class Process {
 		this.initialReference = (111 * (processNum + 1) + processSize) % processSize;
 		this.currentReference = this.initialReference;
 		this.referenceCount = 0;
+		this.faults = 0;
+		this.residency = 0;
+		this.evictions = 0;
 
 	}
 
