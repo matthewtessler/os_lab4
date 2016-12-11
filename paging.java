@@ -1,7 +1,13 @@
 /* Student Name: Matthew Tessler */
 import java.util.*;
+import java.io.*;
+import java.util.Scanner;
 
 public class paging {
+
+	static int[] randomOS = new int[100000];
+	static int randomCount = 0;
+
 	public static void main(String[] args) {
 		/* initialize input vars */
 		int machineSize = Integer.parseInt(args[0]); // M
@@ -20,6 +26,19 @@ public class paging {
 		System.out.println("The number of references per process is " + numOfReferences + ".");
 		System.out.println("The replacement algorithm is " + replacementAlgo + ".");
 		System.out.println("The level of debugging output is " + debugging + ".\n");
+
+		/* randomOS setup */
+		try {
+			File randomFile = new File("randoms.txt");
+			Scanner scanRandom = new Scanner(randomFile);
+			for (int i = 0; i < 100000; i++) {
+				randomOS[i] = scanRandom.nextInt();
+			}
+		}
+		catch (FileNotFoundException ex) {
+			System.out.println("Random OS file not found.");
+			System.exit(0);
+		}
 
 		/* stores frames that hold individual pages from different processes */
 		FrameTable machine = new FrameTable(machineSize, pageSize);
@@ -79,9 +98,50 @@ public class paging {
 				}
 				else if (jobMix == 3) {
 					// random, next reference is (rand) mod S
+					processes[current].currentReference = rand() % processSize;
 				}
 				else if (jobMix == 4) {
-					// something else
+					double A = 0.00;
+					double B = 0.00;
+					double C = 0.00;
+					double y = rand() / (Integer.MAX_VALUE + 1d);
+					if (current == 1) {
+						A = 0.750;
+						B = 0.250;
+						C = 0.000;
+					}
+					else if (current == 2) {
+						A = 0.750;
+						B = 0.000;
+						C = 0.250;
+					}
+					else if (current == 3) {
+						A = 0.750;
+						B = 0.125;
+						C = 0.125;
+					}
+					else if (current == 4) {
+						A = 0.500;
+						B = 0.125;
+						C = 0.125;
+					}
+
+					if (y < A) {
+						// next reference = ( w + 1 + S) mod S
+						processes[current].currentReference = (processes[current].currentReference + 1 + processSize) % processSize;
+					}
+					else if (y < (A + B)) {
+						// next reference = (w - 5 + S) mod S
+						processes[current].currentReference = (processes[current].currentReference - 5 + processSize) % processSize;
+					}
+					else if (y < (A + B + C)) {
+						// next reference = (w + 4 + S) mod S
+						processes[current].currentReference = (processes[current].currentReference + 4 + processSize) % processSize;
+					}
+					else {
+						// random mod S
+						processes[current].currentReference = rand() % processSize;
+					}
 				}
 				processes[current].referenceCount++;
 				time++;
@@ -99,6 +159,10 @@ public class paging {
 	public static void print(FrameTable machine, Process[] processes) {
 		FrameTable.print(machine.frames);
 		Process.printAllProcesses(processes);
+	}
+
+	public static int rand() {
+		return randomOS[randomCount++];
 	}
 
 	// if all processes have made number of references required, return true, else false 
