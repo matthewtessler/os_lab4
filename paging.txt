@@ -1,11 +1,9 @@
-/* if jobMix is two there are four processes -> each process makes references
-		   within itself sequentially, making three references each in a round robin style between
-		   the four processes -> the initial reference is determined by a formula dependent on the 
-		   number of that process and the size of all individual processes (processSize - S) */
+If jobMix is two there are four processes -> each process makes references
+within itself sequentially, making three references each in a round robin style between the four processes -> the initial reference is determined by a formula dependent on the   number of that process and the size of all individual processes (processSize - S) */
 
-/* if jobMix is three it is like jobMix two except references are not sequential, they are 
-		   determined by randomOS -> the initial reference is determined by same formula as jobMix two */
+If jobMix is three it is like jobMix two except references are not sequential, they are 
+determined by randomOS -> the initial reference is determined by same formula as jobMix two 
 
 
-/* if jobMix is four it is still three references per process in round robin except the number
-		   it is referencing is randomly selected */
+If jobMix is four it is still three references per process in round robin except the number
+it is referencing is randomly selected

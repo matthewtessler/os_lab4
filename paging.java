@@ -46,7 +46,21 @@ public class paging {
 					continue;
 				};
 
-				/* work goes here */
+				/* Here the process makes a reference */
+				// See if that reference for that specific process is in frame table
+					// if it is, update last usage time for that page in that process
+					// if it isn't
+						// see if there is an empty spot in the frame Table
+							// if there is an empty spot or spots
+								// put it in highest numbered spot (2 out of 0,1,2)
+									// set load time as well
+							// if there isn't
+								// page replacement algorithm
+									// store eviction info 
+										// residency time, eviction count for process
+										// load time for new page in this frame
+					// find next reference for the process 
+
 
 				processes[current].referenceCount++;
 				time++;
@@ -59,11 +73,7 @@ public class paging {
 			}
 		}
 
-		for (int i = 0; i < processes.length; i++) {
-			System.out.println(processes[i].referenceCount);
-		}
-		System.out.println(time);
-
+		print(machine, processes);
 	}
 
 
@@ -102,7 +112,7 @@ class FrameTable {
 		}
 		System.out.println("");
 		for (int i = 0; i < frames.length; i++) {
-			System.out.print("| Frame " + i + " |");	
+			System.out.printf("|Frame %3d|",i);	
 			for (int j = 0; j < frames[i].onePage.references.length; j++) {
 				System.out.print(" " + frames[i].onePage.references[j] + " |");
 			}
@@ -165,7 +175,7 @@ class Process {
 		}
 		System.out.println("");
 		for (int i = 0; i < pages.length; i++) {
-			System.out.printf("|Page %3d|",i);	
+			System.out.printf("|Page %3d |",i);	
 			for (int j = 0; j < pages[i].references.length; j++) {
 				System.out.printf("%4d|", pages[i].references[j]);
 			}
