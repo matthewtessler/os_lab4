@@ -44,13 +44,17 @@ public class paging {
 			for (int i = 0; i < 3; i++) {
 				if (processes[current].referenceCount + (3 - i) > numOfReferences) {
 					continue;
-				};
+				}
 
-				/* Here the process makes a reference */
-				// See if that reference for that specific process is in frame table
-					// if it is, update last usage time for that page in that process
-					// if it isn't
-						// see if there is an empty spot in the frame Table
+				/* Make references for process */
+
+				// If current reference is in a page in the frame table belonging to current process
+				if (referenceisInFrameTable(machine, processes, current, processes[current].currentReference)) {
+					// update last usage time for page in current process
+					processes[current].lastUsageTime[(processes[current].currentReference)/10] = time;
+				}
+				else {
+					// see if there is an empty spot in the frame Table
 							// if there is an empty spot or spots
 								// put it in highest numbered spot (2 out of 0,1,2)
 									// set load time as well
@@ -59,8 +63,8 @@ public class paging {
 									// store eviction info 
 										// residency time, eviction count for process
 										// load time for new page in this frame
-					// find next reference for the process 
-
+				}
+				// find next reference for the process 
 
 				processes[current].referenceCount++;
 				time++;
@@ -72,16 +76,15 @@ public class paging {
 				current++;
 			}
 		}
-
-		print(machine, processes);
 	}
 
-
+	// prints the frame table and all process tables
 	public static void print(FrameTable machine, Process[] processes) {
 		FrameTable.print(machine.frames);
 		Process.printAllProcesses(processes);
 	}
 
+	// if all processes have made number of references required, return true, else false 
 	public static boolean allReferencesFulfilled(Process[] processes, int numOfReferences) {
 		for (int i = 0; i < processes.length; i++) {
 			if (processes[i].referenceCount < numOfReferences) {
@@ -89,6 +92,19 @@ public class paging {
 			}
 		}
 		return true;
+	}
+
+	// returns true if a reference is in the frame table, else returns false
+	public static boolean referenceisInFrameTable(FrameTable machine, Process[] processes, int processNum, int referenceNum) {
+		for (int i = 0; i < machine.frames.length; i++) {
+			for (int j = 0; j < machine.frames[i].onePage.references.length; j++) {
+				if (machine.frames[i].onePage.process == processNum && 
+					machine.frames[i].onePage.references[j] == referenceNum) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
 
@@ -106,17 +122,18 @@ class FrameTable {
 
 	public static void print(Frame[] frames) {
 		System.out.println("Frame Table");
-		System.out.print("+---------+");;
+		System.out.print("+---------+----------+");;
 		for (int i = 0; i < frames[0].onePage.references.length; i++) {
 			System.out.print("---+");
 		}
 		System.out.println("");
 		for (int i = 0; i < frames.length; i++) {
 			System.out.printf("|Frame %3d|",i);	
+			System.out.printf("Process %2d|", frames[i].onePage.process);
 			for (int j = 0; j < frames[i].onePage.references.length; j++) {
 				System.out.print(" " + frames[i].onePage.references[j] + " |");
 			}
-			System.out.print("\n+---------+");
+			System.out.print("\n+---------+----------+");
 			for (int k = 0; k < frames[0].onePage.references.length; k++) {
 				System.out.print("---+");
 				if (k == frames[0].onePage.references.length - 1) {
@@ -151,8 +168,10 @@ class Page {
 // individual processes have an array of pages dependent on processSize and pageSize
 class Process {
 	Page[] pages; // an array with size of processSize divided by pageSize
+	int[] lastUsageTime;
 	int initialReference;
 	int referenceCount;
+	int currentReference;
 
 	// instantiates array of pages each having pageSize number of references
 	public Process(int processSize, int pageSize, int processNum) {
@@ -164,8 +183,14 @@ class Process {
 				this.pages[i].references[j] = i * (10) + j;
 			}
 		}
+		this.lastUsageTime = new int[pages.length];
+		for (int i = 0; i < this.lastUsageTime.length; i++) {
+			this.lastUsageTime[i] = -1;
+		}
 		this.initialReference = (111 * (processNum + 1) + processSize) % processSize;
+		this.currentReference = this.initialReference;
 		this.referenceCount = 0;
+
 	}
 
 	public static void print(Page[] pages) {
