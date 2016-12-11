@@ -95,7 +95,7 @@ public class paging {
 							for (int k = 0; k < machine.frames.length; k++) {
 								// find the last usage time of that page for that process by integer dividing that element
 								// if the time is lower than the current time set the least recently used equal to that one
-								if (processes[machine.frames[k].onePage.process].lastUsageTime[machine.frames[k].onePage.references[2] / 10] <= leastRecentlyUsedFrame) {
+								if (processes[machine.frames[k].onePage.process].lastUsageTime[machine.frames[k].onePage.references[2]/10] <= leastRecentlyUsedFrame) {
 									leastRecentlyUsedFrame = k;
 								}
 							}
@@ -107,6 +107,39 @@ public class paging {
 							// replace it by copying in the new page and setting the process value of that frame to the new process, pageLoadTime
 							for (int j = 0; j < machine.frames[leastRecentlyUsedFrame].onePage.references.length; j++) {
 								machine.frames[leastRecentlyUsedFrame].onePage.references[j] = processes[current].pages[processes[current].currentReference/10].references[j];
+							}
+							processes[current].pageLoadTime[processes[current].currentReference/10] = time;
+						}
+						else if (replacementAlgo.equals("lifo")) {
+							int mostRecentLoad = -1;
+							// for each frame get the load time of the page
+							for (int k = 0; k < machine.frames.length; k++) {
+								// if the load time is higher than the current time set the variable equal to that
+								if (processes[machine.frames[k].onePage.process].pageLoadTime[machine.frames[k].onePage.references[2]/10] >= mostRecentLoad) {
+									mostRecentLoad = k;
+								}
+							}
+							System.out.println("evicting page " + (machine.frames[mostRecentLoad].onePage.references[3] / 10) + " of process " + 
+								machine.frames[mostRecentLoad].onePage.process + " from frame " + mostRecentLoad + ".\n");
+							processes[current].residency += time - processes[machine.frames[mostRecentLoad].onePage.process].pageLoadTime[machine.frames[mostRecentLoad].onePage.references[3] / 10];
+							processes[current].evictions++;
+							machine.frames[mostRecentLoad].onePage.process = current;
+							// replace it by copying in the new page and setting the process value of that frame to the new process, pageLoadTime
+							for (int j = 0; j < machine.frames[mostRecentLoad].onePage.references.length; j++) {
+								machine.frames[mostRecentLoad].onePage.references[j] = processes[current].pages[processes[current].currentReference/10].references[j];
+							}
+							processes[current].pageLoadTime[processes[current].currentReference/10] = time;
+						}
+						else if (replacementAlgo.equals("random")) {
+							int randomEvict = rand() % machine.frames.length;
+							System.out.println("evicting page " + (machine.frames[randomEvict].onePage.references[3] / 10) + " of process " + 
+								machine.frames[randomEvict].onePage.process + " from frame " + randomEvict + ".\n");
+							processes[current].residency += time - processes[machine.frames[randomEvict].onePage.process].pageLoadTime[machine.frames[randomEvict].onePage.references[3] / 10];
+							processes[current].evictions++;
+							machine.frames[randomEvict].onePage.process = current;
+							// replace it by copying in the new page and setting the process value of that frame to the new process, pageLoadTime
+							for (int j = 0; j < machine.frames[randomEvict].onePage.references.length; j++) {
+								machine.frames[randomEvict].onePage.references[j] = processes[current].pages[processes[current].currentReference/10].references[j];
 							}
 							processes[current].pageLoadTime[processes[current].currentReference/10] = time;
 						}
