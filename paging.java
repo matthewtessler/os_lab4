@@ -47,22 +47,21 @@ public class paging {
 				}
 
 				/* Make references for process */
-
+				System.out.print(current + " references word " + processes[current].currentReference + " at time " + time + ": ");
 				// If current reference is in a page in the frame table belonging to current process
 				if (referenceisInFrameTable(machine, processes, current, processes[current].currentReference)) {
 					// update last usage time for page in current process
 					processes[current].lastUsageTime[(processes[current].currentReference)/10] = time;
 				}
 				else {
-					// see if there is an empty spot in the frame Table
-							// if there is an empty spot or spots
-								// put it in highest numbered spot (2 out of 0,1,2)
-									// set load time as well
-							// if there isn't
-								// page replacement algorithm
-									// store eviction info 
-										// residency time, eviction count for process
-										// load time for new page in this frame
+					// if there is an empty frame to put the page containing the reference
+					if (findHighestEmptyFrame(machine) != -1) {
+						// put page in highest empty frame and set load time
+					}
+					else {
+						// page replacement algorithm
+							// store eviction info, residency time, eviction count for process, load time for new page
+					}
 				}
 				// find next reference for the process 
 
@@ -100,11 +99,24 @@ public class paging {
 			for (int j = 0; j < machine.frames[i].onePage.references.length; j++) {
 				if (machine.frames[i].onePage.process == processNum && 
 					machine.frames[i].onePage.references[j] == referenceNum) {
+					System.out.print("Hit in frame " + i + ".\n");
 					return true;
 				}
 			}
 		}
+		System.out.print("Fault, \n");
 		return false;
+	}
+
+	// finds highest empty frame, returns -1 if there is no empty frame
+	public static int findHighestEmptyFrame(FrameTable machine) {
+		int emptyFrame = -1;
+		for (int i = 0; i < machine.frames.length; i++) {
+			if (machine.frames[i].empty) {
+				emptyFrame = i;
+			}
+		}
+		return emptyFrame;
 	}
 }
 
@@ -148,9 +160,11 @@ class FrameTable {
 // frame within frame table of machine
 class Frame {
 	Page onePage;
+	boolean empty;
 
 	public Frame(int pageSize) {
 		this.onePage = new Page(pageSize, -1);
+		this.empty = true;
 	}
 }
 
