@@ -57,14 +57,32 @@ public class paging {
 					// if there is an empty frame to put the page containing the reference
 					if (findHighestEmptyFrame(machine) != -1) {
 						// put page in highest empty frame and set load time
+						int highestEmptyFrame = findHighestEmptyFrame(machine);
+						System.out.print(" using free frame " + highestEmptyFrame + ".\n");
+						machine.frames[highestEmptyFrame].empty = false;
+						for (int j = 0; j < machine.frames[highestEmptyFrame].onePage.references.length; j++) {
+							machine.frames[highestEmptyFrame].onePage.references[j] = processes[current].pages[processes[current].currentReference/10].references[j];
+						}
+						machine.frames[highestEmptyFrame].onePage.process = current;
+						processes[current].pageLoadTime[processes[current].currentReference/10] = time;
 					}
 					else {
+						System.out.print("evicting page (not implemented yet).\n");
 						// page replacement algorithm
 							// store eviction info, residency time, eviction count for process, load time for new page
 					}
 				}
-				// find next reference for the process 
-
+				// find next reference for the process dependent on jobMix
+				if (jobMix == 1 || jobMix == 2) {
+					// sequential
+					processes[current].currentReference = (processes[current].currentReference + 1 + processSize) % processSize;
+				}
+				else if (jobMix == 3) {
+					// random, next reference is (rand) mod S
+				}
+				else if (jobMix == 4) {
+					// something else
+				}
 				processes[current].referenceCount++;
 				time++;
 			}
@@ -104,7 +122,7 @@ public class paging {
 				}
 			}
 		}
-		System.out.print("Fault, \n");
+		System.out.print("Fault, ");
 		return false;
 	}
 
@@ -182,6 +200,7 @@ class Page {
 // individual processes have an array of pages dependent on processSize and pageSize
 class Process {
 	Page[] pages; // an array with size of processSize divided by pageSize
+	int[] pageLoadTime;
 	int[] lastUsageTime;
 	int initialReference;
 	int referenceCount;
@@ -200,6 +219,10 @@ class Process {
 		this.lastUsageTime = new int[pages.length];
 		for (int i = 0; i < this.lastUsageTime.length; i++) {
 			this.lastUsageTime[i] = -1;
+		}
+		this.pageLoadTime = new int[pages.length];
+		for (int i = 0; i < this.pageLoadTime.length; i++) {
+			this.pageLoadTime[i] = -1;
 		}
 		this.initialReference = (111 * (processNum + 1) + processSize) % processSize;
 		this.currentReference = this.initialReference;
