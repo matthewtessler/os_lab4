@@ -2,7 +2,7 @@
 (correct) 2: 10 10 10 1 100 lru 0 
 (correct) 3: 10 10 10 2 10 lru 0
 (correct) 4: 20 10 10 2 10 lru 0
-(wrong  ) 5: 20 10 10 2 10 random 0
+(correct) 5: 20 10 10 2 10 random 0
 (correct) 6: 20 10 10 2 10 lifo 0
 (correct) 7: 20 10 10 3 10 lru 0
 (correct) 8: 20 10 10 3 10 lifo 0

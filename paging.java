@@ -64,7 +64,6 @@ public class paging {
 				if (processes[current].referenceCount + (3 - i) > numOfReferences) {
 					continue;
 				}
-
 				/* Make references for process */
 				System.out.print((current+1) + " references word " + processes[current].currentReference + " (page " + 
 					(processes[current].currentReference/10) + ") at time " + (time+1) + ": ");
@@ -139,6 +138,7 @@ public class paging {
 							processes[current].lastUsageTime[processes[current].currentReference/10] = time;
 						}
 						else if (replacementAlgo.equals("random")) {
+							System.out.print((current + 1)+ " uses random number: ");
 							int randomEvict = rand() % machine.frames.length;
 							System.out.println("evicting page " + (machine.frames[randomEvict].onePage.references[3] / 10) + " of process " + 
 								(machine.frames[randomEvict].onePage.process+1) + " from frame " + randomEvict + ".");
@@ -161,13 +161,17 @@ public class paging {
 				}
 				else if (jobMix == 3) {
 					// random, next reference is (rand) mod S
-					processes[current].currentReference = rand() % processSize;
+					processes[current].currentReference = rand();
+					System.out.println((current+1) + " uses random number: " + processes[current].currentReference);
+					processes[current].currentReference = processes[current].currentReference % processSize;
 				}
 				else if (jobMix == 4) {
 					double A = 0.00;
 					double B = 0.00;
 					double C = 0.00;
-					double y = rand() / (Integer.MAX_VALUE + 1d);
+					double y = rand();
+					System.out.println((current+1) + "uses random number: " + y);
+					y = y / (Integer.MAX_VALUE + 1d);
 					if (current == 1) {
 						A = 0.750;
 						B = 0.250;
@@ -203,9 +207,16 @@ public class paging {
 					}
 					else {
 						// random mod S
-						processes[current].currentReference = rand() % processSize;
+						processes[current].currentReference = rand();
+						System.out.println((current+1) + "uses random number: " + processes[current].currentReference);
+						processes[current].currentReference = processes[current].currentReference % processSize;
 					}
 				}
+				/* testing */
+				// System.out.print((current + 1) + " uses random number: ");
+				rand();
+				/* testing */
+
 				processes[current].referenceCount++;
 				time++;
 			}
@@ -252,6 +263,7 @@ public class paging {
 	}
 
 	public static int rand() {
+		System.out.println(randomOS[randomCount]);
 		return randomOS[randomCount++];
 	}
 
