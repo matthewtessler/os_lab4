@@ -91,7 +91,7 @@ public class paging {
 					else {
 						// evict the least recently used (lowest last used time)
 						if (replacementAlgo.equals("lru")) {
-							int leastRecentlyUsedFrameTime = 500;
+							int leastRecentlyUsedFrameTime = Integer.MAX_VALUE;
 							int leastRecentlyUsedFrame = -1;
 							// for each frame get the last usage time of the page
 							for (int k = 0; k < machine.frames.length; k++) {
