@@ -12,5 +12,5 @@
 (correct) 12: 40 10 90 1 100 lru 0
 (correct) 13: 40 10 90 1 100 lifo 0 
 (error  ) 14: 800 40 400 4 5000 lru 0
-(almost ) 15: 10 5 30 4 3 random 0
-(error ) 16: 1000 40 400 4 5000 lifo 0
+(correct) 15: 10 5 30 4 3 random 0
+(correct) 16: 1000 40 400 4 5000 lifo 0

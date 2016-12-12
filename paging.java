@@ -102,9 +102,9 @@ public class paging {
 									leastRecentlyUsedFrame = k;
 								}
 							}
-							System.out.println("evicting page " + (machine.frames[leastRecentlyUsedFrame].onePage.references[3] / 10) + " of process " + 
+							System.out.println("evicting page " + (machine.frames[leastRecentlyUsedFrame].onePage.references[3]/pageSize) + " of process " + 
 								(machine.frames[leastRecentlyUsedFrame].onePage.process+1) + " from frame " + leastRecentlyUsedFrame + ".");
-							processes[machine.frames[leastRecentlyUsedFrame].onePage.process].residency += time - processes[machine.frames[leastRecentlyUsedFrame].onePage.process].pageLoadTime[machine.frames[leastRecentlyUsedFrame].onePage.references[3] / 10];
+							processes[machine.frames[leastRecentlyUsedFrame].onePage.process].residency += time - processes[machine.frames[leastRecentlyUsedFrame].onePage.process].pageLoadTime[machine.frames[leastRecentlyUsedFrame].onePage.references[3]/pageSize];
 							processes[machine.frames[leastRecentlyUsedFrame].onePage.process].evictions++;
 							machine.frames[leastRecentlyUsedFrame].onePage.process = current;
 							// replace it by copying in the new page and setting the process value of that frame to the new process, pageLoadTime
@@ -126,9 +126,9 @@ public class paging {
 									mostRecentLoad = k;
 								}
 							}
-							System.out.println("evicting page " + (machine.frames[mostRecentLoad].onePage.references[3] / 10) + " of process " + 
+							System.out.println("evicting page " + (machine.frames[mostRecentLoad].onePage.references[3]/pageSize) + " of process " + 
 								(machine.frames[mostRecentLoad].onePage.process+1) + " from frame " + mostRecentLoad + ".");
-							processes[machine.frames[mostRecentLoad].onePage.process].residency += time - processes[machine.frames[mostRecentLoad].onePage.process].pageLoadTime[machine.frames[mostRecentLoad].onePage.references[3] / 10];
+							processes[machine.frames[mostRecentLoad].onePage.process].residency += time - processes[machine.frames[mostRecentLoad].onePage.process].pageLoadTime[machine.frames[mostRecentLoad].onePage.references[3]/pageSize];
 							processes[machine.frames[mostRecentLoad].onePage.process].evictions++;
 							machine.frames[mostRecentLoad].onePage.process = current;
 							// replace it by copying in the new page and setting the process value of that frame to the new process, pageLoadTime
@@ -140,9 +140,9 @@ public class paging {
 						}
 						else if (replacementAlgo.equals("random")) {
 							int randomEvict = rand() % machine.frames.length;
-							System.out.println("evicting page " + (machine.frames[randomEvict].onePage.references[3] / 10) + " of process " + 
+							System.out.println("evicting page " + (machine.frames[randomEvict].onePage.references[3]/pageSize) + " of process " + 
 								(machine.frames[randomEvict].onePage.process+1) + " from frame " + randomEvict + ".");
-							processes[machine.frames[randomEvict].onePage.process].residency += time - processes[machine.frames[randomEvict].onePage.process].pageLoadTime[machine.frames[randomEvict].onePage.references[3] / 10];
+							processes[machine.frames[randomEvict].onePage.process].residency += time - processes[machine.frames[randomEvict].onePage.process].pageLoadTime[machine.frames[randomEvict].onePage.references[3]/pageSize];
 							processes[machine.frames[randomEvict].onePage.process].evictions++;
 							machine.frames[randomEvict].onePage.process = current;
 							// replace it by copying in the new page and setting the process value of that frame to the new process, pageLoadTime
@@ -380,7 +380,7 @@ class Process {
 			this.pages[i] = new Page(pageSize, processNum);
 			// gives references 0 through page size minus 1
 			for (int j = 0; j < this.pages[i].references.length; j++) {
-				this.pages[i].references[j] = i * (10) + j;
+				this.pages[i].references[j] = i * (pageSize) + j;
 			}
 		}
 		this.lastUsageTime = new int[pages.length];
