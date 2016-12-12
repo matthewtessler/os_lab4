@@ -85,6 +85,7 @@ public class paging {
 						}
 						machine.frames[highestEmptyFrame].onePage.process = current;
 						processes[current].pageLoadTime[processes[current].currentReference/10] = time;
+						processes[current].lastUsageTime[processes[current].currentReference/10] = time;
 					}
 					// page replacement algorithm: store eviction info, residency time, eviction count for process, load time for new page
 					else {
@@ -138,7 +139,6 @@ public class paging {
 							processes[current].lastUsageTime[processes[current].currentReference/10] = time;
 						}
 						else if (replacementAlgo.equals("random")) {
-							System.out.print((current + 1)+ " uses random number: ");
 							int randomEvict = rand() % machine.frames.length;
 							System.out.println("evicting page " + (machine.frames[randomEvict].onePage.references[3] / 10) + " of process " + 
 								(machine.frames[randomEvict].onePage.process+1) + " from frame " + randomEvict + ".");
@@ -162,7 +162,7 @@ public class paging {
 				else if (jobMix == 3) {
 					// random, next reference is (rand) mod S
 					processes[current].currentReference = rand();
-					System.out.println((current+1) + " uses random number: " + processes[current].currentReference);
+					//System.out.println((current+1) + " uses random number: " + processes[current].currentReference + " and processSize is " + processSize);
 					processes[current].currentReference = processes[current].currentReference % processSize;
 				}
 				else if (jobMix == 4) {
@@ -170,24 +170,24 @@ public class paging {
 					double B = 0.00;
 					double C = 0.00;
 					double y = rand();
-					System.out.println((current+1) + "uses random number: " + y);
+					System.out.println((current+1) + " uses random number: " + (int)y);
 					y = y / (Integer.MAX_VALUE + 1d);
-					if (current == 1) {
+					if (current == 0) {
 						A = 0.750;
 						B = 0.250;
 						C = 0.000;
 					}
-					else if (current == 2) {
+					else if (current == 1) {
 						A = 0.750;
 						B = 0.000;
 						C = 0.250;
 					}
-					else if (current == 3) {
+					else if (current == 2) {
 						A = 0.750;
 						B = 0.125;
 						C = 0.125;
 					}
-					else if (current == 4) {
+					else if (current == 3) {
 						A = 0.500;
 						B = 0.125;
 						C = 0.125;
@@ -208,14 +208,13 @@ public class paging {
 					else {
 						// random mod S
 						processes[current].currentReference = rand();
-						System.out.println((current+1) + "uses random number: " + processes[current].currentReference);
+						//System.out.println((current+1) + "uses random number: " + processes[current].currentReference + "and processSize is " + processSize);
 						processes[current].currentReference = processes[current].currentReference % processSize;
 					}
 				}
-				/* testing */
-				// System.out.print((current + 1) + " uses random number: ");
-				rand();
-				/* testing */
+				if (jobMix != 4) {
+					rand();
+				}
 
 				processes[current].referenceCount++;
 				time++;
@@ -263,7 +262,6 @@ public class paging {
 	}
 
 	public static int rand() {
-		System.out.println(randomOS[randomCount]);
 		return randomOS[randomCount++];
 	}
 
