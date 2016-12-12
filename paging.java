@@ -66,11 +66,11 @@ public class paging {
 				}
 				/* Make references for process */
 				System.out.print((current+1) + " references word " + processes[current].currentReference + " (page " + 
-					(processes[current].currentReference/10) + ") at time " + (time+1) + ": ");
+					(processes[current].currentReference/pageSize) + ") at time " + (time+1) + ": ");
 				// If current reference is in a page in the frame table belonging to current process
 				if (referenceisInFrameTable(machine, processes, current, processes[current].currentReference)) {
 					// update last usage time for page in current process
-					processes[current].lastUsageTime[(processes[current].currentReference)/10] = time;
+					processes[current].lastUsageTime[(processes[current].currentReference)/pageSize] = time;
 				}
 				else {
 					processes[current].faults++;
@@ -81,11 +81,11 @@ public class paging {
 						System.out.print(" using free frame " + highestEmptyFrame + ".\n");
 						machine.frames[highestEmptyFrame].empty = false;
 						for (int j = 0; j < machine.frames[highestEmptyFrame].onePage.references.length; j++) {
-							machine.frames[highestEmptyFrame].onePage.references[j] = processes[current].pages[processes[current].currentReference/10].references[j];
+							machine.frames[highestEmptyFrame].onePage.references[j] = processes[current].pages[processes[current].currentReference/pageSize].references[j];
 						}
 						machine.frames[highestEmptyFrame].onePage.process = current;
-						processes[current].pageLoadTime[processes[current].currentReference/10] = time;
-						processes[current].lastUsageTime[processes[current].currentReference/10] = time;
+						processes[current].pageLoadTime[processes[current].currentReference/pageSize] = time;
+						processes[current].lastUsageTime[processes[current].currentReference/pageSize] = time;
 					}
 					// page replacement algorithm: store eviction info, residency time, eviction count for process, load time for new page
 					else {
@@ -97,8 +97,8 @@ public class paging {
 							for (int k = 0; k < machine.frames.length; k++) {
 								// find the last usage time of that page for that process by integer dividing that element
 								// if the time is lower than the current time set the least recently used equal to that one
-								if (processes[machine.frames[k].onePage.process].lastUsageTime[machine.frames[k].onePage.references[2]/10] < leastRecentlyUsedFrameTime) {
-									leastRecentlyUsedFrameTime = processes[machine.frames[k].onePage.process].lastUsageTime[machine.frames[k].onePage.references[2]/10];
+								if (processes[machine.frames[k].onePage.process].lastUsageTime[machine.frames[k].onePage.references[2]/pageSize] < leastRecentlyUsedFrameTime) {
+									leastRecentlyUsedFrameTime = processes[machine.frames[k].onePage.process].lastUsageTime[machine.frames[k].onePage.references[2]/pageSize];
 									leastRecentlyUsedFrame = k;
 								}
 							}
@@ -109,10 +109,10 @@ public class paging {
 							machine.frames[leastRecentlyUsedFrame].onePage.process = current;
 							// replace it by copying in the new page and setting the process value of that frame to the new process, pageLoadTime
 							for (int j = 0; j < machine.frames[leastRecentlyUsedFrame].onePage.references.length; j++) {
-								machine.frames[leastRecentlyUsedFrame].onePage.references[j] = processes[current].pages[processes[current].currentReference/10].references[j];
+								machine.frames[leastRecentlyUsedFrame].onePage.references[j] = processes[current].pages[processes[current].currentReference/pageSize].references[j];
 							}
-							processes[current].pageLoadTime[processes[current].currentReference/10] = time;
-							processes[current].lastUsageTime[processes[current].currentReference/10] = time;
+							processes[current].pageLoadTime[processes[current].currentReference/pageSize] = time;
+							processes[current].lastUsageTime[processes[current].currentReference/pageSize] = time;
 
 						}
 						else if (replacementAlgo.equals("lifo")) {
@@ -121,8 +121,8 @@ public class paging {
 							// for each frame get the load time of the page
 							for (int k = 0; k < machine.frames.length; k++) {
 								// if the load time is higher than the current time set the variable equal to that
-								if (processes[machine.frames[k].onePage.process].pageLoadTime[machine.frames[k].onePage.references[2]/10] > mostRecentLoadTime) {
-									mostRecentLoadTime = processes[machine.frames[k].onePage.process].pageLoadTime[machine.frames[k].onePage.references[2]/10];
+								if (processes[machine.frames[k].onePage.process].pageLoadTime[machine.frames[k].onePage.references[2]/pageSize] > mostRecentLoadTime) {
+									mostRecentLoadTime = processes[machine.frames[k].onePage.process].pageLoadTime[machine.frames[k].onePage.references[2]/pageSize];
 									mostRecentLoad = k;
 								}
 							}
@@ -133,10 +133,10 @@ public class paging {
 							machine.frames[mostRecentLoad].onePage.process = current;
 							// replace it by copying in the new page and setting the process value of that frame to the new process, pageLoadTime
 							for (int j = 0; j < machine.frames[mostRecentLoad].onePage.references.length; j++) {
-								machine.frames[mostRecentLoad].onePage.references[j] = processes[current].pages[processes[current].currentReference/10].references[j];
+								machine.frames[mostRecentLoad].onePage.references[j] = processes[current].pages[processes[current].currentReference/pageSize].references[j];
 							}
-							processes[current].pageLoadTime[processes[current].currentReference/10] = time;
-							processes[current].lastUsageTime[processes[current].currentReference/10] = time;
+							processes[current].pageLoadTime[processes[current].currentReference/pageSize] = time;
+							processes[current].lastUsageTime[processes[current].currentReference/pageSize] = time;
 						}
 						else if (replacementAlgo.equals("random")) {
 							int randomEvict = rand() % machine.frames.length;
@@ -147,10 +147,10 @@ public class paging {
 							machine.frames[randomEvict].onePage.process = current;
 							// replace it by copying in the new page and setting the process value of that frame to the new process, pageLoadTime
 							for (int j = 0; j < machine.frames[randomEvict].onePage.references.length; j++) {
-								machine.frames[randomEvict].onePage.references[j] = processes[current].pages[processes[current].currentReference/10].references[j];
+								machine.frames[randomEvict].onePage.references[j] = processes[current].pages[processes[current].currentReference/pageSize].references[j];
 							}
-							processes[current].pageLoadTime[processes[current].currentReference/10] = time;
-							processes[current].lastUsageTime[processes[current].currentReference/10] = time;
+							processes[current].pageLoadTime[processes[current].currentReference/pageSize] = time;
+							processes[current].lastUsageTime[processes[current].currentReference/pageSize] = time;
 						}
 					}
 				}
