@@ -64,11 +64,13 @@ public class paging {
 				if (processes[current].referenceCount + (3 - i) > numOfReferences) {
 					continue;
 				}
-				/* Make references for process */
-				System.out.print((current+1) + " references word " + processes[current].currentReference + " (page " + 
+				if (debugging == 1 || debugging == 11) {
+					System.out.print((current+1) + " references word " + processes[current].currentReference + " (page " + 
 					(processes[current].currentReference/pageSize) + ") at time " + (time+1) + ": ");
+				}
+				/* Make references for process */
 				// If current reference is in a page in the frame table belonging to current process
-				if (referenceisInFrameTable(machine, processes, current, processes[current].currentReference)) {
+				if (referenceisInFrameTable(machine, processes, current, processes[current].currentReference, debugging)) {
 					// update last usage time for page in current process
 					processes[current].lastUsageTime[(processes[current].currentReference)/pageSize] = time;
 				}
@@ -78,7 +80,9 @@ public class paging {
 					if (findHighestEmptyFrame(machine) != -1) {
 						// put page in highest empty frame and set load time
 						int highestEmptyFrame = findHighestEmptyFrame(machine);
-						System.out.print(" using free frame " + highestEmptyFrame + ".\n");
+						if (debugging == 1 || debugging == 11) {
+							System.out.print(" using free frame " + highestEmptyFrame + ".\n");
+						}
 						machine.frames[highestEmptyFrame].empty = false;
 						for (int j = 0; j < machine.frames[highestEmptyFrame].onePage.references.length; j++) {
 							machine.frames[highestEmptyFrame].onePage.references[j] = processes[current].pages[processes[current].currentReference/pageSize].references[j];
@@ -102,8 +106,10 @@ public class paging {
 									leastRecentlyUsedFrame = k;
 								}
 							}
-							System.out.println("evicting page " + (machine.frames[leastRecentlyUsedFrame].onePage.references[3]/pageSize) + " of process " + 
+							if (debugging == 1 || debugging == 11) {
+								System.out.println("evicting page " + (machine.frames[leastRecentlyUsedFrame].onePage.references[3]/pageSize) + " of process " + 
 								(machine.frames[leastRecentlyUsedFrame].onePage.process+1) + " from frame " + leastRecentlyUsedFrame + ".");
+							}
 							processes[machine.frames[leastRecentlyUsedFrame].onePage.process].residency += time - processes[machine.frames[leastRecentlyUsedFrame].onePage.process].pageLoadTime[machine.frames[leastRecentlyUsedFrame].onePage.references[3]/pageSize];
 							processes[machine.frames[leastRecentlyUsedFrame].onePage.process].evictions++;
 							machine.frames[leastRecentlyUsedFrame].onePage.process = current;
@@ -126,8 +132,10 @@ public class paging {
 									mostRecentLoad = k;
 								}
 							}
-							System.out.println("evicting page " + (machine.frames[mostRecentLoad].onePage.references[3]/pageSize) + " of process " + 
+							if (debugging == 1 || debugging == 11) {
+								System.out.println("evicting page " + (machine.frames[mostRecentLoad].onePage.references[3]/pageSize) + " of process " + 
 								(machine.frames[mostRecentLoad].onePage.process+1) + " from frame " + mostRecentLoad + ".");
+							}
 							processes[machine.frames[mostRecentLoad].onePage.process].residency += time - processes[machine.frames[mostRecentLoad].onePage.process].pageLoadTime[machine.frames[mostRecentLoad].onePage.references[3]/pageSize];
 							processes[machine.frames[mostRecentLoad].onePage.process].evictions++;
 							machine.frames[mostRecentLoad].onePage.process = current;
@@ -140,8 +148,10 @@ public class paging {
 						}
 						else if (replacementAlgo.equals("random")) {
 							int randomEvict = rand() % machine.frames.length;
-							System.out.println("evicting page " + (machine.frames[randomEvict].onePage.references[3]/pageSize) + " of process " + 
+							if (debugging == 1 || debugging == 11) {
+								System.out.println("evicting page " + (machine.frames[randomEvict].onePage.references[3]/pageSize) + " of process " + 
 								(machine.frames[randomEvict].onePage.process+1) + " from frame " + randomEvict + ".");
+							}
 							processes[machine.frames[randomEvict].onePage.process].residency += time - processes[machine.frames[randomEvict].onePage.process].pageLoadTime[machine.frames[randomEvict].onePage.references[3]/pageSize];
 							processes[machine.frames[randomEvict].onePage.process].evictions++;
 							machine.frames[randomEvict].onePage.process = current;
@@ -162,7 +172,9 @@ public class paging {
 				else if (jobMix == 3) {
 					// random, next reference is (rand) mod S
 					processes[current].currentReference = rand();
-					//System.out.println((current+1) + " uses random number: " + processes[current].currentReference + " and processSize is " + processSize);
+					if (debugging == 11) {
+						System.out.println((current+1) + " uses random number: " + processes[current].currentReference);
+					}
 					processes[current].currentReference = processes[current].currentReference % processSize;
 				}
 				else if (jobMix == 4) {
@@ -170,7 +182,9 @@ public class paging {
 					double B = 0.00;
 					double C = 0.00;
 					double y = rand();
-					System.out.println((current+1) + " uses random number: " + (int)y);
+					if (debugging == 11) {
+						System.out.println((current+1) + " uses random number: " + (int)y);
+					}
 					y = y / (Integer.MAX_VALUE + 1d);
 					if (current == 0) {
 						A = 0.750;
@@ -208,12 +222,19 @@ public class paging {
 					else {
 						// random mod S
 						processes[current].currentReference = rand();
-						//System.out.println((current+1) + "uses random number: " + processes[current].currentReference + "and processSize is " + processSize);
+						if (debugging == 11) {
+							System.out.println((current+1) + " uses random number: " + processes[current].currentReference);
+						}
 						processes[current].currentReference = processes[current].currentReference % processSize;
 					}
 				}
 				if (jobMix != 4) {
-					rand();
+					if (debugging == 11) {
+						System.out.println((current+1) + " uses random number " + rand());
+					}
+					else {
+						rand();
+					}
 				}
 
 				processes[current].referenceCount++;
@@ -241,7 +262,7 @@ public class paging {
 			}
 			else {
 				System.out.println("Process " + (i+1) + " had " + processes[i].faults + " faults.");
-				System.out.println("	With no evictions, the overall average residency is undefined.");
+				System.out.println("	With no evictions, the average residence is undefined.");
 				totalFaults += processes[i].faults;
 			}
 			
@@ -251,7 +272,7 @@ public class paging {
 		}
 		else {
 			System.out.println("\nThe total number of faults is " + totalFaults + " faults.");
-			System.out.println("	With no evictions, the overall average residency is undefined.");
+			System.out.println("	With no evictions, the overall average residence is undefined.");
 		}	
 	}
 
@@ -276,17 +297,21 @@ public class paging {
 	}
 
 	// returns true if a reference is in the frame table, else returns false
-	public static boolean referenceisInFrameTable(FrameTable machine, Process[] processes, int processNum, int referenceNum) {
+	public static boolean referenceisInFrameTable(FrameTable machine, Process[] processes, int processNum, int referenceNum, int debugging) {
 		for (int i = 0; i < machine.frames.length; i++) {
 			for (int j = 0; j < machine.frames[i].onePage.references.length; j++) {
 				if (machine.frames[i].onePage.process == processNum && 
 					machine.frames[i].onePage.references[j] == referenceNum) {
-					System.out.print("Hit in frame " + i + ".\n");
+					if (debugging == 1 || debugging == 11) {
+						System.out.print("Hit in frame " + i + ".\n");
+					}
 					return true;
 				}
 			}
 		}
-		System.out.print("Fault, ");
+		if (debugging == 1 || debugging == 11) {
+			System.out.print("Fault, ");
+		}
 		return false;
 	}
 
