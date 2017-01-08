@@ -4,7 +4,7 @@ Project Language: Java
 Running Instructions: 
 	
 	javac paging.java <-- compile
-	java paging INPUT GOES HERE <-- execute (inputs from inputs.txt)
+	java paging INPUT GOES HERE <-- execute
 
 Example Running (input 1):  
 	
